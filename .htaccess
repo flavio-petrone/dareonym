@@ -1,0 +1,8 @@
+Options -Indexes
+DirectoryIndex index.php
+<FilesMatch "(^\.|\.(sql|md|json|log|zip|sqlite|bak)$)">
+Require all denied
+</FilesMatch>
+<Files "router.php">
+Require all denied
+</Files>
