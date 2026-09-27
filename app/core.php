@@ -30,6 +30,17 @@ function request_is_https(?array $server = null, ?bool $trustProxy = null): bool
     // Reject comma-separated chains and ambiguous values.
     return $trustProxy && strtolower(trim((string)($server['HTTP_X_FORWARDED_PROTO'] ?? ''))) === 'https';
 }
+// Build an HTTPS URL without trusting path or header delimiters.
+function https_url(array $server): ?string
+{
+    $host = $server['HTTP_HOST'] ?? '';
+    $uri = $server['REQUEST_URI'] ?? '/';
+    if (!is_string($host) || !preg_match('/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?(?::[0-9]{1,5})?$/iD', $host)
+        || !is_string($uri) || !str_starts_with($uri, '/') || preg_match('/[\\x00-\\x20\\x7f]/', $uri)) {
+        return null;
+    }
+    return 'https://'.preg_replace('/:80$/', '', $host).$uri;
+}
 function config(): array
 {
     static $config;
@@ -276,6 +287,20 @@ if (PHP_SAPI !== 'cli') {
     header('Referrer-Policy: same-origin');
     header('Cache-Control: no-store');
     header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
+    // The loopback development server is the only HTTP exception.
+    if ((PHP_SAPI !== 'cli-server' || !in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)) && !request_is_https()) {
+        if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
+            http_response_code(400);
+            exit('Apri il sito tramite HTTPS e invia nuovamente il modulo.');
+        }
+        $secureUrl = https_url($_SERVER);
+        if ($secureUrl === null) {
+            http_response_code(400);
+            exit('Indirizzo della richiesta non valido.');
+        }
+        header('Location: '.$secureUrl, true, 302);
+        exit;
+    }
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
     session_name('dareonym2');

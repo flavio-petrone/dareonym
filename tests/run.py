@@ -41,7 +41,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 with tempfile.TemporaryDirectory(prefix='dareonym2-tests-') as temp:
     app = Path(temp) / 'app'
-    shutil.copytree(ROOT, app, ignore=shutil.ignore_patterns('local.php', 'install.php', '*.sqlite', '*.log'))
+    shutil.copytree(ROOT, app, ignore=shutil.ignore_patterns('.git', '.github', 'local.php', 'install.php', 'https-proxy.php', '*.sqlite', '*.log'))
     demo = app / 'scripts/demo.php'
     if mysql:
         private = Path(temp) / 'db.json'
@@ -107,8 +107,13 @@ with tempfile.TemporaryDirectory(prefix='dareonym2-tests-') as temp:
                 break
             except OSError:
                 time.sleep(.05)
-        check(request(anon)[0] == 303, 'anonymous dashboard redirects')
+        check(request(anon)[0] == 303 and request(anon)[1].get('Location') == 'scopri.php', 'anonymous entry redirects to public showcase')
         check(request(anon, '/index.php?page=login')[0] == 200, 'login renders')
+        status, headers, body = request(anon, '/scopri.php')
+        check(status == 200 and b'demo-next' in body, 'public showcase accessible without login')
+        check('Set-Cookie' not in headers, 'showcase does not create a session')
+        check('scopri.php' in request(anon, '/index.php?page=login')[2].decode(), 'login links to public showcase')
+        check(request(anon, '/assets/scopri.js')[0] == 200 and request(anon, '/assets/scopri.css')[0] == 200, 'showcase assets available')
         check(request(anon, '/index.php', {'action': 'login'})[0] == 403, 'missing CSRF blocked')
         admin = login('admin@example.test')
         creator = login('creator@example.test')

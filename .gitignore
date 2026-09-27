@@ -20,3 +20,6 @@
 !/database/schema.mysql.sql
 
 /config/https-proxy.php
+
+__pycache__/
+*.pyc

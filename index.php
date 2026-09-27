@@ -28,6 +28,10 @@ $page = $_GET['page'] ?? 'dashboard';
 if (!is_string($page)) {
     abort_request(404, 'Pagina non disponibile.');
 }
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_GET['page']) && !current_user()) {
+    header('Location: scopri.php', true, 303);
+    exit;
+}
 if ($page === 'login' && current_user()) {
     go();
 }

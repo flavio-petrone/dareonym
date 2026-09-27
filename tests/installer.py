@@ -31,7 +31,7 @@ def check(condition,label):
     print('PASS:',label)
 with tempfile.TemporaryDirectory(prefix='dareonym-install-') as tmp:
     app=Path(tmp)/'app'
-    shutil.copytree(root,app,ignore=shutil.ignore_patterns('local.php','install.php','*.sqlite','*.log'))
+    shutil.copytree(root,app,ignore=shutil.ignore_patterns('.git','.github','local.php','install.php','https-proxy.php','*.sqlite','*.log'))
     with socket.socket() as sock:
         sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
     log=open(Path(tmp)/'server.log','w+')

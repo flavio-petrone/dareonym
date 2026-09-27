@@ -76,7 +76,7 @@ Verifica il percorso completo sul tuo hosting, anche da telefono. Controlla che 
 
 Quando il test è riuscito si può pianificare il passaggio all’URL definitivo, mantenendo un backup privato recuperabile. Non lasciare archivi o vecchi dump nel percorso pubblico. L’app usa collegamenti relativi ed è progettata per funzionare in una sottocartella, senza riscrittura degli URL.
 
-Le impostazioni dello specifico account Altervista non sono state ispezionate né modificate durante lo sviluppo. Nessun dato o credenziale del sito reale è stato usato nei test.
+La prima installazione su Altervista è stata successivamente completata e collaudata manualmente; vedi [TEST.md](TEST.md). Le suite automatiche usano esclusivamente copie isolate e dati fittizi.
 
 Riferimenti del servizio: [PHP](https://help.altervista.org/it/PHP), [database MySQL](https://help.altervista.org/it/Database_MySQL). Alcune pagine della documentazione sono storiche: fanno fede anche le opzioni disponibili nel pannello del tuo account.
 
@@ -85,3 +85,10 @@ Riferimenti del servizio: [PHP](https://help.altervista.org/it/PHP), [database M
 Se il sito viene aperto tramite HTTPS ma l’installer lo rifiuta, il proxy dell’hosting potrebbe terminare TLS prima di PHP. L’app ignora normalmente `X-Forwarded-Proto`. Solo su un hosting con proxy fidato che sovrascrive tale intestazione e impedisce l’accesso diretto all’origine, copiare `config/https-proxy.example.php` in `config/https-proxy.php` e impostare `return true;`. Il controllo è condiviso dall’installer e dai cookie Secure. Non attivare questa opzione su server generici raggiungibili direttamente. Il file locale è escluso da Git.
 
 Il supporto Altervista descrive l’uso di `X-Forwarded-Proto`: https://forum.it.altervista.org/problemi-tecnici-account/293426-forzare-https.html. Verificare il risultato sul proprio account sia in HTTPS sia in HTTP prima di inserire credenziali.
+
+
+## Presentazione pubblica
+
+Dopo l’installazione, l’indirizzo principale porta i visitatori non autenticati a `scopri.php`. Chi è già autenticato vede la propria dashboard. `index.php?page=login` resta il collegamento diretto all’accesso. La presentazione e la simulazione non aprono sessioni e non interrogano il database.
+
+Le richieste HTTP all’applicazione installata vengono reindirizzate a HTTPS prima della creazione della sessione. I POST HTTP sono respinti, senza reinviare automaticamente dati o password. L’eccezione HTTP è il server PHP di sviluppo avviato localmente.

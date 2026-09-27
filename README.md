@@ -1,10 +1,16 @@
-# Dareonym 2
+# Dareonym
 
 **Piccoli passi. Risultati condivisi.**
 
+[Apri il progetto online](https://fpetrone.altervista.org/dareonym2/) · [Installazione](docs/INSTALLAZIONE.md) · [Test e verifiche](docs/TEST.md)
+
+La presentazione pubblica include una **simulazione interattiva senza account**: sfida, prova, riscontro e classifica. La simulazione usa esclusivamente dati fittizi nel browser. Per utilizzare l’applicazione reale serve un account creato dall’amministratore.
+
+![Presentazione pubblica di Dareonym](docs/presentazione.png)
+
 Dareonym trasforma gli obiettivi di un gruppo in sfide concrete: il creator pubblica una sfida, il partecipante invia una prova fotografica e il creator la valuta. I risultati approvati alimentano la classifica individuale e di squadra.
 
-Ricostruzione del progetto originale di Flavio Petrone, con codice e interfaccia nuovi. Pensata per un primo repository completo, comprensibile e utilizzabile: nessun framework da configurare sul server, nessun asset commerciale, nessuna dipendenza da CDN.
+Ricostruzione del progetto originale di Flavio Petrone, con codice e interfaccia nuovi. Un’applicazione per una comunità amministrata: nessun framework da configurare sul server, nessun asset commerciale, nessuna dipendenza da CDN.
 
 ## Cosa puoi fare
 
@@ -40,7 +46,7 @@ Dashboard per ruolo, schede delle sfide, gestione dei gruppi, coda di valutazion
 - HTML, CSS e JavaScript senza build obbligatoria.
 - Python 3 per i test end-to-end HTTP.
 
-PHP 8.4.11 e MariaDB 13.0.2 sono stati effettivamente usati nel collaudo locale. MySQL 8 e le versioni PHP precedenti a quella di test sono obiettivi di compatibilità, non combinazioni collaudate in questa consegna. Prima del caricamento verificare la versione PHP disponibile nell’account Altervista.
+Collaudo locale con PHP 8.4.11, SQLite e MariaDB 13.0.2. Il percorso principale è stato verificato anche su Altervista con PHP 8.4 e MySQL 8.0: installazione, ruoli, gruppi, sfida, invio, approvazione e classifica. La matrice CI è configurata per PHP 8.2 e 8.4 con SQLite e MySQL 8.0; consultare la scheda Actions per gli esiti effettivi.
 
 ## Prova locale in due passaggi
 
@@ -103,6 +109,7 @@ Le query sono parametrizzate. I permessi sono verificati sul server anche per le
 ## Test
 
 ```sh
+php tests/https.php
 python3 tests/run.py
 ```
 
@@ -130,11 +137,23 @@ I due comandi richiedono database distinti e vuoti. Creano dati fittizi e non el
 
 Per segnalazioni e limiti operativi leggi [SECURITY.md](SECURITY.md).
 
-## Ambito della versione 2.0
+## Ambito della versione 2.1
 
 Questa è una prima versione funzionante del percorso principale. Non include registrazione pubblica, recupero password via email, notifiche email/push, modifica retroattiva dei punteggi, esportazioni, cronologia di tutte le fotografie sostituite, paginazione avanzata o amministrazione della conservazione dei dati. Gli account si recuperano tramite un amministratore; le sfide pubblicate si possono chiudere e sostituire, senza modificarne retroattivamente le condizioni.
 
-La pubblicazione del codice su GitHub e l’attivazione del servizio online sono passaggi distinti. Il collaudo sullo specifico account Altervista resta da effettuare prima di sostituire il sito attuale. La nuova versione non corregge la cronologia GitHub del progetto precedente e non revoca le credenziali esposte in passato.
+Il sito dimostrativo è ospitato in una cartella separata dal progetto precedente. Il percorso principale online è stato collaudato; risultati, verifiche successive e limiti sono riportati in [TEST.md](docs/TEST.md).
+
+## Aggiornamenti e manutenzione
+
+La pubblicazione su GitHub non aggiorna automaticamente Altervista. Per creare uno ZIP con i soli file runtime:
+
+```sh
+python3 scripts/package.py /percorso/dareonym-runtime.zip
+```
+
+Lo script usa un elenco esplicito: configurazioni private, database, foto, log e cronologia Git non entrano nell’archivio. L’archivio completo include i `.htaccess`: su installazioni esistenti confrontarli con le direttive aggiunte dall’hosting prima di sostituirli. [Manutenzione e ripristino](docs/MANUTENZIONE.md) spiega backup e aggiornamenti.
+
+Le segnalazioni riproducibili sono benvenute: leggi [CONTRIBUTING.md](CONTRIBUTING.md). Per problemi riservati segui [SECURITY.md](SECURITY.md).
 
 ## Licenza
 

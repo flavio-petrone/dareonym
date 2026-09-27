@@ -1,0 +1,53 @@
+name: Tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.4']
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test-only-password
+          MYSQL_DATABASE: dareonym_test_flow
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -ptest-only-password"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo_mysql, pdo_sqlite, gd, fileinfo, mbstring
+          coverage: none
+      - name: PHP syntax and HTTPS checks
+        run: |
+          find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
+          php tests/https.php
+      - name: SQLite integration
+        run: python3 tests/run.py
+      - name: Prepare isolated MySQL databases
+        run: |
+          php -r '$db=new PDO("mysql:host=127.0.0.1;port=3306", "root", "test-only-password"); $db->exec("CREATE DATABASE dareonym_test_install CHARACTER SET utf8mb4");'
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          for name in ('flow', 'install'):
+              config = dict(driver='mysql', host='127.0.0.1', port='3306', database='dareonym_test_' + name, username='root', password='test-only-password')
+              (Path(os.environ['RUNNER_TEMP']) / (name + '.json')).write_text(json.dumps(config))
+          PY
+      - name: MySQL integration and installer
+        run: |
+          python3 tests/run.py --mysql-config "$RUNNER_TEMP/flow.json"
+          python3 tests/installer.py "$RUNNER_TEMP/install.json"
