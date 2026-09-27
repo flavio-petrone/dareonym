@@ -13,6 +13,23 @@ function env(string $key, mixed $default = null): mixed
     $v = getenv($key);
     return $v === false ? $default : $v;
 }
+// Proxy headers are ignored unless this deployment explicitly opts in.
+// Enable only when the hosting edge overwrites X-Forwarded-Proto and the
+// PHP origin cannot be reached directly by untrusted clients.
+function request_is_https(?array $server = null, ?bool $trustProxy = null): bool
+{
+    $server ??= $_SERVER;
+    $https = strtolower((string)($server['HTTPS'] ?? ''));
+    if (in_array($https, ['on', '1'], true)) {
+        return true;
+    }
+    if ($trustProxy === null) {
+        $path = ROOT . '/config/https-proxy.php';
+        $trustProxy = is_file($path) && (require $path) === true;
+    }
+    // Reject comma-separated chains and ambiguous values.
+    return $trustProxy && strtolower(trim((string)($server['HTTP_X_FORWARDED_PROTO'] ?? ''))) === 'https';
+}
 function config(): array
 {
     static $config;
@@ -262,7 +279,7 @@ if (PHP_SAPI !== 'cli') {
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
     session_name('dareonym2');
-    session_set_cookie_params(['httponly' => true,'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),'samesite' => 'Lax','path' => '/']);
+    session_set_cookie_params(['httponly' => true,'secure' => request_is_https(),'samesite' => 'Lax','path' => '/']);
     session_start();
     $_SESSION['csrf'] ??= bin2hex(random_bytes(32));
     set_exception_handler(function (Throwable $error): void {

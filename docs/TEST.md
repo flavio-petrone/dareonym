@@ -23,3 +23,7 @@ Installer: blocco senza codice privato, rifiuto del codice errato, schema e ammi
 Non sono stati verificati lo specifico hosting Altervista, le sue impostazioni PHP/Apache e i permessi del filesystem, MySQL 8 come motore distinto, versioni PHP diverse dalla 8.4.11, carichi elevati o un audit esaustivo da parte di terzi. La protezione Apache è inclusa ma i test HTTP usano il router locale PHP. Le caratteristiche del server remoto devono essere controllate prima dell’attivazione.
 
 I test MySQL/MariaDB richiedono database vuoti con prefisso `dareonym_test_`; non eliminano automaticamente le tabelle. Le credenziali JSON devono essere conservate fuori dal repository.
+
+## Correzione HTTPS su hosting con proxy
+
+Dopo la correzione: 12 controlli dedicati (`php tests/https.php`) e tutte le 81 verifiche HTTP SQLite superate nuovamente. Il controllo del proxy richiede attivazione esplicita; intestazioni inoltrate non autorizzate o ambigue sono respinte. Il collaudo remoto della correzione resta da eseguire.

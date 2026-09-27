@@ -9,7 +9,7 @@ function setup_page(): never
     $ready = is_string($secret) && strlen($secret) >= 24 && $secret !== 'SOSTITUISCI_CON_UN_CODICE_CASUALE';
     $error = null;
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (PHP_SAPI !== 'cli-server' && (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off')) {
+        if (PHP_SAPI !== 'cli-server' && !request_is_https()) {
             abort_request(400, 'Apri il sito tramite HTTPS prima di installare Dareonym.');
         }
         if (!$ready || !hash_equals($secret, field('install_code', 200))) {

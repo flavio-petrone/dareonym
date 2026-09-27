@@ -18,3 +18,5 @@
 *.bak
 *.sql
 !/database/schema.mysql.sql
+
+/config/https-proxy.php
