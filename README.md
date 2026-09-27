@@ -46,7 +46,7 @@ Dashboard per ruolo, schede delle sfide, gestione dei gruppi, coda di valutazion
 - HTML, CSS e JavaScript senza build obbligatoria.
 - Python 3 per i test end-to-end HTTP.
 
-Collaudo locale con PHP 8.4.11, SQLite e MariaDB 13.0.2. Il percorso principale è stato verificato anche su Altervista con PHP 8.4 e MySQL 8.0: installazione, ruoli, gruppi, sfida, invio, approvazione e classifica. La matrice CI è configurata per PHP 8.2 e 8.4 con SQLite e MySQL 8.0; consultare la scheda Actions per gli esiti effettivi.
+Collaudo locale con PHP 8.4.11, SQLite e MariaDB 13.0.2. Il percorso principale è stato verificato anche su Altervista con PHP 8.4 e MySQL 8.0: installazione, ruoli, gruppi, sfida, invio, approvazione e classifica. La matrice CI ha superato i controlli su PHP 8.2 e 8.4 con SQLite e MySQL 8.0. [Esito verificato](https://github.com/flavio-petrone/dareonym/actions/runs/36348742782).
 
 ## Prova locale in due passaggi
 
